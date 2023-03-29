@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mssql
+  labels:
+    run: mssql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: mssql
+  template:
+    metadata:
+      labels:
+        run: mssql
+    spec:
+      volumes:
+      - name: mssql-storage
+        persistentVolumeClaim:
+          claimName: mssql-pvc
+      initContainers:
+      - name: volume-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 10001:0 /var/opt/mssql"]
+        volumeMounts:
+        - mountPath: "/var/opt/mssql"
+          name: mssql-storage
+      containers:
+      - name: mssql
+        image: mcr.microsoft.com/mssql/server:2019-latest 
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: SA_PASSWORD
+          value: MSSQL_PASSWORD
+        - name: MSSQL_PID
+          value: Standard
+        ports:
+        - containerPort: 1433
+        volumeMounts:
+        - mountPath: "/var/opt/mssql"
+          name: mssql-storage
+

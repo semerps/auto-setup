@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nlm
+  name: nlm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: nlm
+  template:
+    metadata:
+      labels:
+        run: nlm
+    spec:
+      volumes:
+        - name: nlm-conf-dir
+          persistentVolumeClaim:
+            claimName: nlm-conf-pvc
+      containers:
+      - image: semerp/nlm-server
+        name: nlm
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 30083
+          name: http
+        volumeMounts:
+          - mountPath: "/usr/src/app/conf"
+            name: nlm-conf-dir   
+      

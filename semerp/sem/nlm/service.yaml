@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+   name: nlm
+spec:
+  type: NodePort
+  ports:
+  - port: 30083
+    nodePort: 30083
+  selector:
+    run: nlm
+

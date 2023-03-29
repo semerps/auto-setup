@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+   name: rabbitmq
+spec:
+  type: NodePort
+  ports:
+  - port: 15672 
+    nodePort: 30962
+    name: rabbitmq
+  - port: 5672
+    nodePort: 32062
+    name: ampq1
+  - port: 5671
+    nodePort: 32061
+    name: amqp2
+  - port: 4369
+    nodePort: 32063
+    name: amqp3
+  - port: 15674
+    nodePort: 30964
+    name: amqp4
+  selector:
+    run: rabbitmq

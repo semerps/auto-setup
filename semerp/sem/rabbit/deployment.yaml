@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: rabbitmq
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        run: rabbitmq
+        app: rabbitmq
+      name: rebbitmq
+    spec:
+      containers:
+      - image: rabbitmq:3-management
+        name: rabbitmq
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          value: uzmartech
+        - name: RABBITMQ_DEFAULT_PASS
+          value: Sem123654@
+        - name: RABBITMQ_DEFAULT_VHOST
+          value: semerp   
+        ports:
+        - containerPort: 15672
+          name: rabbitmq 
+        - containerPort: 5672
+          name: amqp1
+        - containerPort: 5671
+          name: amqp2
+        - containerPort: 4369
+          name: amqp3
+        - containerPort: 15674
+          name: amqp4
+#    command: ["rabbitmq-plugins", "enable","rabbitmq_web_stomp","--offline"]

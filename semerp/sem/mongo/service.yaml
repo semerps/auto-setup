@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+   name: mongo
+spec:
+  type: NodePort
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    run: mongodb
+    
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: mongoexpress
+spec:
+  type: NodePort
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    run: mongodb
+
