@@ -276,7 +276,7 @@ print_message "Redis sunucusu kurulumu tamamlandı."
 #<!-----------------SEM Kurulumu----------------------------
 print_message "SEM sunucusu sizin için kuruluyor..."
 
-sed -i "s|SEM_SETUP_DIR|$CURRENT_DIR/sem|g" files/semerp/volume.yaml
+sed -i "s|SEM_SETUP_DIR|$CURRENT_DIR/files|g" files/semerp/volume.yaml
 sed -i "s|MSSQL_ADDRS|$mssql_addrs|g" files/conf/server.xml
 sed -i "s|MSSQL_PORT|$mssql_port|g" files/conf/server.xml
 sed -i "s|MSSQL_USER|$mssql_user|g" files/conf/server.xml
