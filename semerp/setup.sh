@@ -3,7 +3,7 @@
 #ZIP dosyasının indirme bağlantısı
 apt update
 apt install -y unzip
-unzip sem/setup.zip
+unzip files/setup.zip
 CURRENT_DIR=$(pwd)
 namespace="semerp"
 #<!------------------Fonksiyon Listesi----------------------------
@@ -138,7 +138,7 @@ if command -v microk8s kubectl == "/snap/bin/microk8s"; then
     print_message "Kubernetes kurulu."
     microk8s.kubectl create namespace $namespace
     microk8s.kubectl delete secret regcred -n $namespace
-    microk8s.kubectl create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=docker_user --docker-password=docker_pass --docker-email=docker_email -n $namespace
+    microk8s.kubectl create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=${docker_user} --docker-password=${docker_pass} --docker-email=${docker_email} -n $namespace
 else
     print_message "Sisteminizde kubernete kurulu olmadığı tespit edildi ve kurulum otomatik olarak başlatılıyor..."
     #!/bin/bash
@@ -146,7 +146,11 @@ else
     # microk8s'ı yükleyin ve etkinleştirin
     sudo snap install microk8s --classic
     sudo microk8s status --wait-ready
-    sudo microk8s enable dashboard dns registry istio
+    sudo microk8s enable dashboard
+    sudo microk8s enable dns 
+    sudo microk8s enable registry 
+    sudo microk8s enable community
+    sudo microk8s enable istio
 
     # kubectl için alias'ı ekleyin
     echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc
@@ -227,9 +231,9 @@ else
     mssql_gantt_db="sem_gantt"
 
     print_message "MSSQL sunucusu sizin için kuruluyor..."
-    sed -i "s|MSSQL_PASSWORD|$mssql_pass|g" sem/mssql/deployment.yaml
-    sed -i "s|MSSQL_DATA_PATH|$CURRENT_DIR/sem/mssql/data|g" sem/mssql/storage.yaml
-    #microk8s.kubectl apply -f sem/mssql/ -n $namespace
+    sed -i "s|MSSQL_PASSWORD|$mssql_pass|g" files/mssql/deployment.yaml
+    sed -i "s|MSSQL_DATA_PATH|$CURRENT_DIR/files/mssql/data|g" files/mssql/storage.yaml
+    #microk8s.kubectl apply -f files/mssql/ -n $namespace
     wait_for_pod $namespace mssql
     
     read -p "DBS Klasöründeki yedekeeri MSSQL sunucusuna yüklemek istiyor musunuz? (Y/N): " restore_db
@@ -254,14 +258,14 @@ fi
 
 #<!------------------RabbitMQ Kurulumu----------------------------
 print_message "RabbitMQ sunucusu sizin için kuruluyor..."
-microk8s.kubectl apply -f sem/rabbit/ -n $namespace
+microk8s.kubectl apply -f files/rabbit/ -n $namespace
 wait_for_pod $namespace rabbitmq
 print_message "RabbitMQ sunucusu kurulumu tamamlandı."
 #------------------RabbitMQ Kurulumu----------------------------!>
 
 #<!------------------Redis Kurulumu----------------------------
 print_message "Redis sunucusu sizin için kuruluyor..."
-microk8s.kubectl apply -f sem/redis/ -n $namespace
+microk8s.kubectl apply -f files/redis/ -n $namespace
 wait_for_pod $namespace redis
 print_message "Redis sunucusu kurulumu tamamlandı."
 #------------------Redis Kurulumu----------------------------!>
@@ -270,24 +274,14 @@ print_message "Redis sunucusu kurulumu tamamlandı."
 print_message "SEM sunucusu sizin için kuruluyor..."
 mssql_addrs="mssql.$namespace.svc.cluster.local"
 mssql_port="1433"
-sed -i "s|SEM_SETUP_DIR|$CURRENT_DIR/sem|g" sem/semerp/volume.yaml
-sed -i "s|MSSQL_ADDRS|$mssql_addrs|g" sem/conf/server.xml
-sed -i "s|MSSQL_PORT|$mssql_port|g" sem/conf/server.xml
-sed -i "s|MSSQL_USER|$mssql_user|g" sem/conf/server.xml
-sed -i "s|MSSQL_PASS|$mssql_pass|g" sem/conf/server.xml
-sed -i "s|MSSQL_SEM_DB|$mssql_sem_db|g" sem/conf/server.xml
-sed -i "s|MSSQL_GANTT_DB|$mssql_gantt_db|g" sem/conf/server.xml
-microk8s.kubectl apply -f sem/semerp/ -n $namespace
+sed -i "s|SEM_SETUP_DIR|$CURRENT_DIR/sem|g" files/semerp/volume.yaml
+sed -i "s|MSSQL_ADDRS|$mssql_addrs|g" files/conf/server.xml
+sed -i "s|MSSQL_PORT|$mssql_port|g" files/conf/server.xml
+sed -i "s|MSSQL_USER|$mssql_user|g" files/conf/server.xml
+sed -i "s|MSSQL_PASS|$mssql_pass|g" files/conf/server.xml
+sed -i "s|MSSQL_SEM_DB|$mssql_sem_db|g" files/conf/server.xml
+sed -i "s|MSSQL_GANTT_DB|$mssql_gantt_db|g" files/conf/server.xml
+microk8s.kubectl apply -f files/semerp/ -n $namespace
 wait_for_pod $namespace semerp-latest
 print_message "SEM sunucusu kurulumu tamamlandı."
 #-----------------SEM Kurulumu----------------------------!>
-
-#<!------------------MongoDB Kurulumu----------------------------
-print_message "MongoDB sunucusu sizin için kuruluyor..."
-mkdir -p $CURRENT_DIR/sem/mongodb/data
-microk8s.kubectl apply -f sem/mongodb/ -n $namespace
-sed -i "s|MONGODB_PATH|$CURRENT_DIR/sem/mongodb/data|g" sem/mssql/storage.yaml
-wait_for_pod $namespace mongodb
-print_message "MongoDB sunucusu kurulumu tamamlandı."
-#------------------MongoDB Kurulumu----------------------------!>
-

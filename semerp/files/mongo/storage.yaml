@@ -1,25 +1,25 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nlm-conf-pv
+  name: mongo-pv
 spec:
   capacity:
-    storage: 1Mi
-  storageClassName: nlmconf
+    storage: 20Gi
+  storageClassName: mongodb
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   hostPath:
-    path: "/home/pnsem/shared/nlm"
+    path: MONGODB_PATH/data
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nlm-conf-pvc
+  name: mongo-pvc
 spec:
   accessModes:
-    - ReadWriteMany
-  storageClassName: nlmconf
+    - ReadWriteOnce
+  storageClassName: mongodb
   resources:
     requests:
-      storage: 1Mi
+      storage: 20Gi

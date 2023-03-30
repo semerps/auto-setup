@@ -14,6 +14,12 @@ spec:
       labels:
         run: semerp-latest  
     spec:
+      dnsPolicy: "Default"
+      dnsConfig:
+        nameservers:
+          - 10.152.183.10  # Kubernetes DNS IP adresi
+        searches:
+          - namespace.svc.cluster.local
       volumes:
         - name: shareddir
           persistentVolumeClaim:

@@ -1,3 +1,4 @@
-#UZMAR Auto Setup Projects 
+# Auto-Setup
+UZMAR Teknoloji için bazı kurulumları basit düzeyde yapılabilmesi amacıyla oluşturulmuştur.
 
-1 -
+[SEM ERP auto setup](semerp/files/README.md)
