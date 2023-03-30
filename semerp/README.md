@@ -5,7 +5,8 @@ Bu proje, SEM ERP ve bağlı bileşenlerinin (MSSQL, RabbitMQ, Redis, ElasticSea
 1. Terminali açın, projeyi çekin ve setup projenin ana dizinine gidin:
 ```bash
 git clone https://github.com/semerps/auto-setup
-cd /path/to/semerp
+cd auto-setup/semerp
+sh setup.sh
 ```
 
 2. `setup.sh` betiğini çalıştırarak kurulum sürecini başlatın:
