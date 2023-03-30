@@ -14,6 +14,7 @@ spec:
       labels:
         run: nlm
     spec:
+      dnsPolicy: ClusterFirst
       volumes:
         - name: nlm-conf-dir
           persistentVolumeClaim:
