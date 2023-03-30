@@ -3,7 +3,7 @@
 #ZIP dosyasının indirme bağlantısı
 apt update
 apt install -y unzip
-unzip files/setup.zip
+unzip files/setup.zip files/
 CURRENT_DIR=$(pwd)
 namespace="semerp"
 #<!------------------Fonksiyon Listesi----------------------------
