@@ -3,7 +3,7 @@
 #ZIP dosyasının indirme bağlantısı
 apt update
 apt install -y unzip
-unzip files/setup.zip files/
+unzip files/setup.zip -d files
 CURRENT_DIR=$(pwd)
 namespace="semerp"
 #<!------------------Fonksiyon Listesi----------------------------
@@ -233,7 +233,7 @@ else
     print_message "MSSQL sunucusu sizin için kuruluyor..."
     sed -i "s|MSSQL_PASSWORD|$mssql_pass|g" files/mssql/deployment.yaml
     sed -i "s|MSSQL_DATA_PATH|$CURRENT_DIR/files/mssql/data|g" files/mssql/storage.yaml
-    #microk8s.kubectl apply -f files/mssql/ -n $namespace
+    microk8s.kubectl apply -f files/mssql/ -n $namespace
     wait_for_pod $namespace mssql
     
     read -p "DBS Klasöründeki yedekeeri MSSQL sunucusuna yüklemek istiyor musunuz? (Y/N): " restore_db
