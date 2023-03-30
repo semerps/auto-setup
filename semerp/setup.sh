@@ -248,6 +248,9 @@ else
         create_database $mssql_gantt_db
     fi
 
+    mssql_addrs="mssql.$namespace.svc.cluster.local"
+    mssql_port="1433"
+
     print_message "MSSQL sunucusu kurulumu tamamlandı."
 fi
 
@@ -272,8 +275,7 @@ print_message "Redis sunucusu kurulumu tamamlandı."
 
 #<!-----------------SEM Kurulumu----------------------------
 print_message "SEM sunucusu sizin için kuruluyor..."
-mssql_addrs="mssql.$namespace.svc.cluster.local"
-mssql_port="1433"
+
 sed -i "s|SEM_SETUP_DIR|$CURRENT_DIR/sem|g" files/semerp/volume.yaml
 sed -i "s|MSSQL_ADDRS|$mssql_addrs|g" files/conf/server.xml
 sed -i "s|MSSQL_PORT|$mssql_port|g" files/conf/server.xml
