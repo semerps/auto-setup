@@ -20,7 +20,7 @@ module.exports = {
   sem: {
     server: "http://semerp-latest.namespace.svc.cluster.local:8090/sem",
     username: "Administrator",
-    password: "1",
+    password: "pass",
   },
   amqp: {
     uri: "amqp://uzmartech:Sem123654%40@rabbitmq.semerp.svc.cluster.local:5672/semerp",

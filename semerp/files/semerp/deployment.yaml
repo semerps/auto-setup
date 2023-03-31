@@ -61,7 +61,7 @@ spec:
           mountPath: "/usr/local/openjdk-8/jre/lib/fonts"
         env:
         - name: JAVA_OPTS
-          value: "-Duser.timezone=Europe/Istanbul -Dsem.basepath=http://127.0.0.1:8090/sem -Dsem.username=Administrator -Dsem.password=1 -Dbryntum.db=jdbc/GanttDb"
+          value: "-Duser.timezone=Europe/Istanbul -Dsem.basepath=http://127.0.0.1:8090/sem -Dsem.username=Administrator -Dsem.password=pass -Dbryntum.db=jdbc/GanttDb"
         - name: CATALINA_OPTS
           value: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.rmi.port=5000 -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote.ssl=false
         startupProbe:
