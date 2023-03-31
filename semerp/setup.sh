@@ -45,9 +45,9 @@ sql_exec() {
   local sql="$1"
   local database="$2"
   if [ "$database" ]; then
-    sqlcmd -S "${mssql_addrs},${mssql_port}" -U "${mssql_user}" -P "${mssql_pass}" -d "${database}" -Q "${sql}"
+    /opt/mssql-tools/bin/sqlcmd -S "${mssql_addrs},${mssql_port}" -U "${mssql_user}" -P "${mssql_pass}" -d "${database}" -Q "${sql}"
   else
-    sqlcmd -S "${mssql_addrs},${mssql_port}" -U "${mssql_user}" -P "${mssql_pass}" -Q "${sql}"
+    /opt/mssql-tools/bin/sqlcmd -S "${mssql_addrs},${mssql_port}" -U "${mssql_user}" -P "${mssql_pass}" -Q "${sql}"
   fi
 }
 
@@ -170,10 +170,10 @@ else
     sudo microk8s enable istio
 
     # kubectl için alias'ı ekleyin
-    sudo echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc && sudo source ~/.bashrc
-    sudo usermod -a -G microk8s $USER
-    sudo chown -R $USER ~/.kube
+    echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc && source ~/.bashrc
     newgrp microk8s
+    usermod -a -G microk8s $USER
+    chown -R $USER ~/.kube
 
     microk8s.kubectl create namespace $namespace
 
@@ -191,7 +191,7 @@ else
 fi
 
 
-if command -v sqlcmd == "/opt/mssql-tools/bin/sqlcmd"; then
+if command -v /opt/mssql-tools/bin/sqlcmd == "/opt/mssql-tools/bin/sqlcmd"; then
   print_message "SQLCMD kurulu."
 else
   curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
@@ -202,9 +202,6 @@ else
 
   # MSSQL-Tools'u yükle
   sudo apt-get install mssql-tools unixodbc-dev
-
-  # MSSQL-Tools araçlarını PATH'e ekle
-  sudo echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc && sudo source ~/.bashrc
 
   # MSSQL-Tools yükleme işlemi tamamlandı
   print_message "MSSQL-Tools yükleme işlemi tamamlandı."
