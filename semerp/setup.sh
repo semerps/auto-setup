@@ -172,9 +172,9 @@ else
     # kubectl için alias'ı ekleyin
     echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc
     source ~/.bashrc
-    sudo usermod -a -G microk8s elduser
-    sudo chown -R elduser ~/.kube
-    newgrp microk8s
+    #sudo usermod -a -G microk8s elduser
+    #sudo chown -R elduser ~/.kube
+    #newgrp microk8s
 
     microk8s.kubectl create namespace $namespace
 
