@@ -170,11 +170,10 @@ else
     sudo microk8s enable istio
 
     # kubectl için alias'ı ekleyin
-    echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc
-    source ~/.bashrc
-    #sudo usermod -a -G microk8s elduser
-    #sudo chown -R elduser ~/.kube
-    #newgrp microk8s
+    sudo echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc && sudo source ~/.bashrc
+    sudo usermod -a -G microk8s $USER
+    sudo chown -R $USER ~/.kube
+    newgrp microk8s
 
     microk8s.kubectl create namespace $namespace
 
@@ -205,8 +204,7 @@ else
   sudo apt-get install mssql-tools unixodbc-dev
 
   # MSSQL-Tools araçlarını PATH'e ekle
-  echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-  source ~/.bashrc
+  sudo echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc && sudo source ~/.bashrc
 
   # MSSQL-Tools yükleme işlemi tamamlandı
   print_message "MSSQL-Tools yükleme işlemi tamamlandı."
