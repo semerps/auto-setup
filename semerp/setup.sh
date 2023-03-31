@@ -167,7 +167,7 @@ else
     sudo microk8s enable dns 
     sudo microk8s enable registry 
     sudo microk8s enable community
-    sudo microk8s enable istio
+    #sudo microk8s enable istio
 
     # kubectl için alias'ı ekleyin
     echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc && source ~/.bashrc
