@@ -25,9 +25,9 @@ spec:
         name: mongodb
         env:
         - name: MONGO_INITDB_ROOT_USERNAME
-          value: root
+          value: mongodb_username
         - name: MONGO_INITDB_ROOT_PASSWORD
-          value: Sem123654.
+          value: mongodb_password
         ports:
         - containerPort: 27017
         volumeMounts:
@@ -37,9 +37,9 @@ spec:
         name: mongoexpress
         env:
         - name: ME_CONFIG_MONGODB_ADMINUSERNAME
-          value: root
+          value: mongodb_username
         - name: ME_CONFIG_MONGODB_ADMINPASSWORD
-          value: Sem123654.
+          value: mongodb_password
         - name: ME_CONFIG_MONGODB_SERVER
           value: localhost
         ports:

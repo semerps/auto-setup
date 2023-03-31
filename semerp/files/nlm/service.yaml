@@ -5,8 +5,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: 30083
-    nodePort: 30083
+  - port: 5040
+    nodePort: 30040
   selector:
     run: nlm
 

@@ -24,7 +24,7 @@ spec:
         name: nlm
         imagePullPolicy: Always
         ports:
-        - containerPort: 30083
+        - containerPort: 5040
           name: http
         volumeMounts:
           - mountPath: "/usr/src/app/conf"

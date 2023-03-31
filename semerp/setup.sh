@@ -6,6 +6,7 @@ apt install -y unzip
 unzip files/setup.zip -d files
 CURRENT_DIR=$(pwd)
 namespace="semerp"
+ip_address=$(ip -4 addr show eth0 | grep -oP "(?<=inet ).*(?=/)")
 #<!------------------Fonksiyon Listesi----------------------------
 
 echo "Bulunduğunuz dizin: $CURRENT_DIR"
@@ -50,6 +51,28 @@ sql_exec() {
   fi
 }
 
+#Sem Konfigürasyon ayarlarını yapar
+upsert_config() {
+  local config_key="$1"
+  local config_value="$2"
+
+  # Anahtarın tanımlı olup olmadığına bakar
+  local check_query="IF EXISTS (SELECT 1 FROM dbo.sys_config WHERE config_key = '${config_key}') SELECT 1 as 'exists' ELSE SELECT 0 as 'exists';"
+  local exists=$(sql_exec "${check_query}" "${mssql_sem_db}" | tail -n 1 | tr -d '[:space:]')
+
+  if [ "$exists" -eq "1" ]; then
+    # Eğer anahtar varsa anahtar ı günceller
+    local update_query="UPDATE dbo.sys_config SET config_value = '${config_value}' WHERE config_key = '${config_key}';"
+    sql_exec "${update_query}" "${mssql_sem_db}"
+    echo "Config key '${config_key}' updated with value '${config_value}'."
+  else
+    # Eğer anahtar yoksa anahtarı ekler
+    local insert_query="INSERT INTO dbo.sys_config (config_key, config_value) VALUES ('${config_key}', '${config_value}');"
+    sql_exec "${insert_query}" "${mssql_sem_db}"
+    echo "Config key '${config_key}' added with value '${config_value}'."
+  fi
+}
+
 #Database oluşturma fonksiyonu
 create_database() {
   local database="$1"
@@ -76,12 +99,6 @@ restore_database() {
   # SQLCMD ile geri yükleme işlemini başlatma
   sql_exec "${SQL_RESTORE}"
 }
-
-
-
-# Fonksiyonu çağırın
-#wait_for_pod my-namespace my-deployment
-
 
 #------------------Fonksiyon Listesi----------------------------!>
 
@@ -273,6 +290,7 @@ wait_for_pod $namespace redis
 print_message "Redis sunucusu kurulumu tamamlandı."
 #------------------Redis Kurulumu----------------------------!>
 
+
 #<!-----------------SEM Kurulumu----------------------------
 print_message "SEM sunucusu sizin için kuruluyor..."
 
@@ -285,5 +303,101 @@ sed -i "s|MSSQL_SEM_DB|$mssql_sem_db|g" files/conf/server.xml
 sed -i "s|MSSQL_GANTT_DB|$mssql_gantt_db|g" files/conf/server.xml
 microk8s.kubectl apply -f files/semerp/ -n $namespace
 wait_for_pod $namespace semerp-latest
+upsert_config BryntumServiceUri "http://$ip_address:30080/gantt-service"
+upsert_config Notification.SERVER "false"
 print_message "SEM sunucusu kurulumu tamamlandı."
 #-----------------SEM Kurulumu----------------------------!>
+
+
+#<!----------------Document Converter Kurulumu----------------------------
+print_message "Document Converter sunucusu sizin için kuruluyor..."
+microk8s.kubectl apply -f files/document-converter/ -n $namespace
+wait_for_pod $namespace document-converter
+upsert_config document-converter.address "http://$ip_address:30081"
+print_message "Document Converter sunucusu kurulumu tamamlandı."
+#----------------Document Converter Kurulumu----------------------------!>
+
+#<!-----------------Parametre Kurulumu----------------------------
+print_message "SEM ERP için gerekli parametrelerin yapılandırılması..."
+read -p "Lütfen SEM ERP için firma adını giriniz: " ref_params
+upsert_config company.title "$ref_params"
+#-----------------Parametre Kurulumu----------------------------!>
+
+if [ "$choice" = "1" ]; then
+print_message "SEM ERP hizmeti kurulmuştur \n Erişim için http://$ip_address:30080/sem adresini kullanabilirsiniz. "
+exit 1
+;;
+fi
+
+
+#<!----------------Elastic Kurulumu----------------------------
+print_message "Elastic sunucusu sizin için kuruluyor..."
+apt install jq
+sed -i "s|ELASTIC_SEARCH_PATH|$CURRENT_DIR/files/elasticsearch|g" files/elasticsearch/deployment.yaml
+microk8s.kubectl apply -f files/elasticsearch/ -n $namespace
+wait_for_pod $namespace elasticsearch
+wait_for_pod $namespace kibana
+response_elk_token=$(curl -s -X POST "elasticsearch.$namespace.svc.cluster.local:9200/_security/api_key" -H "Content-Type: application/json" -d'
+{
+  "name": "nlm-api-key",
+  "role_descriptors": {
+    "my_role": {
+      "cluster": ["all"],
+      "index": [
+        {
+          "names": ["*"],
+          "privileges": ["all"]
+        }
+      ]
+    }
+  }
+}')
+
+elk_api_key=$(echo $response_elk_token | jq -r '.api_key')
+elk_api_key_id=$(echo $response_elk_token | jq -r '.id')
+
+print_message "Elastic sunucusu kurulumu tamamlandı."
+#----------------Elastic Kurulumu----------------------------!>
+
+#<!-----------------Mongo Kurulumu----------------------------
+print_message "Mongo sunucusu sizin için kuruluyor..."
+read -p "Lütfen MongoDB için kullanıcı adı giriniz: " mongodb_username
+read -p "Lütfen MongoDB için şifre giriniz: " mongodb_password
+sed -i "s|MONGODB_PATH|$CURRENT_DIR/files/mongo|g" files/mongo/storage.yaml
+sed -i "s|mongodb_username|$mongodb_username|g" files/mongo/deployment.yaml
+sed -i "s|mongodb_password|$mongodb_password|g" files/mongo/deployment.yaml
+
+microk8s.kubectl apply -f files/mongo/ -n $namespace
+wait_for_pod $namespace mongo
+#mongo kurulduktan sonra bu pod a bağlanarak yeni bir db oluşturma işlemi yapılacak
+microk8s.kubectl exec -it -n "${namespace}" "deployment/mongodb" -- mongo "sem" -u "${mongodb_username}" -p "${mongodb_password}" --authenticationDatabase admin --eval "db.createCollection('init')"
+
+print_message "Mongo sunucusu kurulumu tamamlandı."
+#-----------------Mongo Kurulumu----------------------------!>
+
+#<!-----------------NLM Kurulumu----------------------------
+print_message "NLM sunucusu sizin için kuruluyor..."
+sed -i "s|NLM_PATH|$CURRENT_DIR/files/nlm|g" files/mongo/storage.yaml
+sed -i "s|mongodb_username|$mongodb_username|g" files/nlm/conf/db.js
+sed -i "s|mongodb_password|$mongodb_password|g" files/nlm/conf/db.js
+sed -i "s|namespace|$namespace|g" files/nlm/conf/db.js
+sed -i "s|elk_api_key|$elk_api_key|g" files/nlm/conf/db.js
+sed -i "s|serverIP|$ip_address|g" files/nlm/conf/db.js
+
+microk8s.kubectl apply -f files/nlm/ -n $namespace
+wait_for_pod $namespace nlm
+upsert_config Notification.SERVER "http://$ip_address:30040"
+
+print_message "NLM sunucusu kurulumu tamamlandı."
+#-----------------NLM Kurulumu----------------------------!>
+
+
+print_message "SEM ERP hizmeti kurulmuştur \n 
+SEMERP için http://$ip_address:30080/sem adresini kullanabilirsiniz.\n 
+RabbitMQ için http://$ip_address:30962 adresini kullanabilirsiniz.\n
+Kibana için http://$ip_address:30601 adresini kullanabilirsiniz.\n 
+NLM için http://$ip_address:30040 adresini kullanabilirsiniz. \n 
+MongoDB Express için http://$ip_address:30082 adresini kullanabilirsiniz.
+kullanıcı adı: $mongodb_username \n
+şifre: $mongodb_password \n
+"

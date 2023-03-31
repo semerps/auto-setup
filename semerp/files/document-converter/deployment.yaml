@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: document-converter
+  name: document-converter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: document-converter
+  template:
+    metadata:
+      labels:
+        run: document-converter
+    spec:
+      volumes:
+      - name: tmpdir
+        emptyDir: {}
+      containers:
+      - image: semerp/document-converter:1.0
+        name: document-converter
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: tmpdir
+          mountPath: /tmp/document-converter
+        startupProbe:
+          httpGet:
+            path: /accept/doc/pdf
+            port: 8080
+          failureThreshold: 20
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /accept/doc/pdf
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 60    
+      imagePullSecrets:
+      - name: regcred      

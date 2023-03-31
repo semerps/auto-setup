@@ -18,11 +18,12 @@ kind: Service
 metadata:
   name: kibana
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: kibana
   ports:
   - protocol: TCP
     port: 5601
+    nodePort: 30601
     targetPort: 5601
     name: http
