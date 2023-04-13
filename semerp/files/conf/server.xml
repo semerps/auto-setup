@@ -10,11 +10,11 @@
   <GlobalNamingResources>
 
 <Resource auth="Container" driverClassName="net.sourceforge.jtds.jdbc.Driver" 
-			initialSize="10" 
+			initialSize="5" 
 			jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(threshold=10000)" 
 			dialect = "com.anamar.dialect.MSSQLDialect"
-			jmxEnabled="true" logAbandoned="true" maxActive="15" maxWait="10000" 
-			minEvictableIdleTimeMillis="30000" minIdle="10" name="jdbc/SemMsSql" 
+			jmxEnabled="true" logAbandoned="true" maxActive="100" maxWait="30000" 
+			minEvictableIdleTimeMillis="600000" minIdle="5" name="jdbc/SemMsSql" 
 			password="MSSQL_PASS" removeAbandoned="true" removeAbandonedTimeout="60" 
 			testOnBorrow="true" testOnReturn="false" testWhileIdle="true" 
 			timeBetweenEvictionRunsMillis="5000" type="javax.sql.DataSource" validationQuery = "SELECT 1"
@@ -22,10 +22,10 @@
 
 
 <Resource auth="Container" driverClassName="net.sourceforge.jtds.jdbc.Driver"  
-			initialSize="10" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(threshold=10000)" 
+			initialSize="5" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(threshold=10000)" 
 			dialect = "com.anamar.dialect.MSSQLDialect"
-			jmxEnabled="true" logAbandoned="true" maxActive="15" maxWait="10000" 
-			minEvictableIdleTimeMillis="30000" minIdle="10" name="jdbc/GanttDb" 
+			jmxEnabled="true" logAbandoned="true" maxActive="100" maxWait="30000" 
+			minEvictableIdleTimeMillis="600000" minIdle="5" name="jdbc/GanttDb" 
 			password="MSSQL_PASS" removeAbandoned="true" removeAbandonedTimeout="60" 
 			testOnBorrow="true" testOnReturn="false" testWhileIdle="true" 
 			timeBetweenEvictionRunsMillis="5000" type="javax.sql.DataSource" validationQuery = "SELECT 1"
