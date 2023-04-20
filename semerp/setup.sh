@@ -14,7 +14,7 @@ echo "Bulunduğunuz dizin: $CURRENT_DIR"
 # Fonksiyon tanımı
 print_message() {
   echo "\n##############################################################################\n"
-  echo $1 
+  echo $1
   echo "\n##############################################################################\n"
 }
 
@@ -27,7 +27,7 @@ wait_for_pod() {
       replicas=$(microk8s.kubectl -n $namespace get deployment $deployment -o jsonpath='{.status.replicas}')
       available=$(microk8s.kubectl -n $namespace get deployment $deployment -o jsonpath='{.status.availableReplicas}')
       if [ "$replicas" = "$available" ]; then
-        
+
         print_message "$deployment All replicas are available"
         break
       else
@@ -164,8 +164,8 @@ else
     sudo snap install microk8s --classic
     sudo microk8s status --wait-ready
     sudo microk8s enable dashboard
-    sudo microk8s enable dns 
-    sudo microk8s enable registry 
+    sudo microk8s enable dns
+    sudo microk8s enable registry
     sudo microk8s enable community
     #sudo microk8s enable istio
 
@@ -247,7 +247,7 @@ else
     sed -i "s|MSSQL_DATA_PATH|$CURRENT_DIR/files/mssql/data|g" files/mssql/storage.yaml
     microk8s.kubectl apply -f files/mssql/ -n $namespace
     wait_for_pod $namespace mssql
-    
+
     read -p "DBS Klasöründeki yedekeeri MSSQL sunucusuna yüklemek istiyor musunuz? (Y/N): " restore_db
 
     if [ "$restore_db" = "Y" ]; then
@@ -276,6 +276,13 @@ print_message "RabbitMQ sunucusu sizin için kuruluyor..."
 microk8s.kubectl apply -f files/rabbit/ -n $namespace
 wait_for_pod $namespace rabbitmq
 print_message "RabbitMQ sunucusu kurulumu tamamlandı."
+#------------------RabbitMQ Kurulumu----------------------------!>
+
+#<!------------------EKAP Banned Service Kurulumu----------------------------
+print_message "EKAP Banned Servisi sizin için kuruluyor..."
+microk8s.kubectl apply -f files/ekap/ -n $namespace
+wait_for_pod $namespace ekap
+print_message "EKAP Banned Servisi kurulumu tamamlandı."
 #------------------RabbitMQ Kurulumu----------------------------!>
 
 #<!------------------Redis Kurulumu----------------------------
@@ -387,11 +394,11 @@ print_message "NLM sunucusu kurulumu tamamlandı."
 #-----------------NLM Kurulumu----------------------------!>
 
 
-print_message "SEM ERP hizmeti kurulmuştur \n 
-SEMERP için http://$ip_address:30080/sem adresini kullanabilirsiniz.\n 
+print_message "SEM ERP hizmeti kurulmuştur \n
+SEMERP için http://$ip_address:30080/sem adresini kullanabilirsiniz.\n
 RabbitMQ için http://$ip_address:30962 adresini kullanabilirsiniz.\n
-Kibana için http://$ip_address:30601 adresini kullanabilirsiniz.\n 
-NLM için http://$ip_address:30040 adresini kullanabilirsiniz. \n 
+Kibana için http://$ip_address:30601 adresini kullanabilirsiniz.\n
+NLM için http://$ip_address:30040 adresini kullanabilirsiniz. \n
 MongoDB Express için http://$ip_address:30082 adresini kullanabilirsiniz.
 kullanıcı adı: $mongodb_username \n
 şifre: $mongodb_password \n
