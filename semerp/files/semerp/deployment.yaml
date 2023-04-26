@@ -68,7 +68,7 @@ spec:
           httpGet:
             path: /sem
             port: 8090
-          failureThreshold: 50
+          failureThreshold: 30
           periodSeconds: 20
         readinessProbe:
           httpGet:
@@ -76,6 +76,6 @@ spec:
             port: 8090
           initialDelaySeconds: 200
           periodSeconds: 10
-          failureThreshold: 50    
+          failureThreshold: 30    
       imagePullSecrets:
       - name: regcred            
