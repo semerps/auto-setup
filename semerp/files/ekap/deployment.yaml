@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: ekap.banned.query.service
+  name: ekap.banned.query.service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: ekap.banned.query.service
+  template:
+    metadata:
+      labels:
+        run: ekap.banned.query.service
+    spec:
+      containers:
+        - image: semerp/ekap.banned.query.service:latest
+          name: ekap-banned-query-service
+          imagePullPolicy: Always
+          env:
+            - name: amqpURL
+              value: "amqp://uzmartech:Sem123654@@rabbitmq.sem-test.svc.cluster.local:5672/semerp"
+#              value: "amqp://username:password@@rabbitmq.namespace.svc.cluster.local:amqpPort/vhost"
