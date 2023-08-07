@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: db-backup-sem
 spec:
-  schedule:  "0 0 * * * *"
+  schedule:  "0 0 * * *"
   successfulJobsHistoryLimit: 3 # Son 3 başarılı işin kaydını tut
   failedJobsHistoryLimit: 3     # Başarısız işlerin kaydını tutma
   jobTemplate:
