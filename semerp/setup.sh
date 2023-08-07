@@ -170,10 +170,10 @@ else
     #sudo microk8s enable istio
 
     # kubectl için alias'ı ekleyin
-    echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc && source ~/.bashrc
-    newgrp microk8s
-    usermod -a -G microk8s $USER
-    chown -R $USER ~/.kube
+    #echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc && source ~/.bashrc
+    #newgrp microk8s
+    #usermod -a -G microk8s $USER
+    #chown -R $USER ~/.kube
 
     microk8s.kubectl create namespace $namespace
 
