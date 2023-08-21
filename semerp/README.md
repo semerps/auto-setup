@@ -19,3 +19,15 @@ git clone https://github.com/semerps/auto-setup && cd auto-setup/semerp && chmod
 
 # Sorun Giderme
 Eğer herhangi bir sorunla karşılaşırsanız, betiğin çıktısındaki hata mesajlarını inceleyin. Gerekirse, betiği düzenleyerek hatalı kısımları düzeltebilir ve yeniden çalıştırabilirsiniz.
+
+
+# Veritabanı Yedekleme
+Bu proje ayrıca, belirtilen SQL veritabanını düzenli olarak yedekleyen bir Kubernetes CronJob da içermektedir. Bu CronJob, her gün gece yarısı çalışacak ve veritabanını yedekleyecektir.
+
+## Yedekleme İşlemi
+Yedekleme işlemi, önceden belirtilen bir yedekleme dizinine yedeklerin kaydedilmesi ile gerçekleştirilir. Ayrıca, bu işlem 180 gün ve daha eski yedeklemeleri otomatik olarak silecek, böylece depolama alanı tükenmez. Yedekler sql sunucu içerisindeki `/var/opt/mssql/data/backup` klasörüne alınır. Genelde bu dosyada auto setup projesinin mssql projesinin içerisindeki `data\backup`dosyasıdır.
+## Yapılandırma
+CronJob'un doğru çalışması için, gerekli environment değişkenlerinin (`SA_PASSWORD`, `NAMESPACE`, `DB_NAME` vb.) değerleri ile doldurulması gerekmektedir. DB_NAME için dizi kullanabilirsiniz (sem,sem-gantt vb.)
+
+## Sorun Giderme
+Eğer yedekleme işlemiyle ilgili herhangi bir sorunla karşılaşırsanız, Kubernetes loglarını kontrol edin. Bunun yanı sıra, CronJob'un yapılandırmasının doğru olduğundan ve gerekli dizinlerin/erişim izinlerinin düzgün bir şekilde ayarlandığından emin olun.

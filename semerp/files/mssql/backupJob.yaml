@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup-sem
+spec:
+  schedule:  "0 0 * * *"
+  successfulJobsHistoryLimit: 3 # Son 3 başarılı işin kaydını tut
+  failedJobsHistoryLimit: 3     # Başarısız işlerin kaydını tutma
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: db-backup-sem
+            image: mcr.microsoft.com/mssql-tools
+            command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              # 6 aydan eski dosyaları sil
+              find /backup -type f -mtime +180 -exec rm -f {} \;
+              # Veritabanı adlarını dizi olarak ayarla
+              DB_NAMES=$(echo $DB_NAME | tr "," "\n")
+              for DB in $DB_NAMES
+              do
+                # Her veritabanı için yedekleme komutu
+                /opt/mssql-tools/bin/sqlcmd -S mssql.$(NAMESPACE).svc.cluster.local -U SA -P $(SA_PASSWORD) -Q "BACKUP DATABASE [$DB] TO DISK = '/var/opt/mssql/data/backup/${DB}_$(TZ='UTC-3' date +D%Y%m%d_T%H%M).bak' WITH NOFORMAT, NOINIT, NAME = '$DB-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
+              done
+            env:
+            - name: SA_PASSWORD
+              value: MSSQL_PASSWORD
+            - name: NAMESPACE
+              value: NAME_SPACE
+            - name: DB_NAME
+              value: DB_NAMES_TO_BACKUP
+            volumeMounts:
+            - mountPath: "/backup"
+              name: mssql-storage
+          volumes:
+          - name: mssql-storage
+            persistentVolumeClaim:
+              claimName: mssql-pvc
+          restartPolicy: OnFailure
