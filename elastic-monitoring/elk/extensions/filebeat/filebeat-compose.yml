@@ -1,0 +1,66 @@
+version: '3.7'
+
+services:
+  filebeat:
+    build:
+      context: extensions/filebeat/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    # Run as 'root' instead of 'filebeat' (uid 1000) to allow reading
+    # 'docker.sock' and the host's filesystem.
+    user: root
+    command:
+      # Log to stderr.
+      - -e
+      # Disable config file permissions checks. Allows mounting
+      # 'config/filebeat.yml' even if it's not owned by root.
+      # see: https://www.elastic.co/guide/en/beats/libbeat/current/config-file-permissions.html
+      - --strict.perms=false
+    volumes:
+      - ./extensions/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro,Z
+      - ./extensions/filebeat/logs/out.log:/usr/share/filebeat/out.log:ro
+#      - type: bind
+#        source: /var/lib/docker/containers
+#        target: /var/lib/docker/containers
+#        read_only: true
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      # This is needed for filebeat to load container log path as specified in filebeat.yml
+#      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+
+      # # This is needed for filebeat to load jenkins build log path as specified in filebeat.yml
+      # - /var/lib/docker/volumes/jenkins_home/_data/jobs/:/var/lib/docker/volumes/jenkins_home/_data/jobs/:ro
+
+      # This is needed for filebeat to load logs for system and auth modules
+      - /var/log/:/var/log/:ro
+      # This is needed for filebeat to load logs for auditd module. you might have to install audit system
+      # on ubuntu first (sudo apt-get install -y auditd audispd-plugins)
+      #      - /var/log/audit/:/var/log/audit/:ro
+      # (!) CA certificate. Generate using instructions from tls/README.md
+      - ./tls/kibana/elasticsearch-ca.pem:/usr/share/filebeat/elasticsearch-ca.pem:ro,z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      ELASTICSEARCH_HOST: elasticsearch
+      KIBANA_HOST: kibana
+      #      KIBANA_SYSTEM_USERNAME: kibana_system
+      KIBANA_SYSTEM_USERNAME: elastic
+      #      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${ELASTIC_PASSWORD:-}
+      LOG_FILE_PATH: /var/log/filebeat/*.log
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+      - kibana
+    deploy:
+      resources:
+        limits:
+          cpus: 0.20
+    restart: unless-stopped
+
+volumes:
+  filebeat:

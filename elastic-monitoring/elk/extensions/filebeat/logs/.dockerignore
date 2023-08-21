@@ -1,0 +1,4 @@
+# Ignore Docker build files
+.out2.log
+.dockerignore
+

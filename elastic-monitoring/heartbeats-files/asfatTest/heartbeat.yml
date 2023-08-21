@@ -1,0 +1,38 @@
+heartbeat.monitors:
+- type: http
+  schedule: '@every 5m'
+  urls:
+    - http://semerp-test.sem-test.svc.cluster.local:8090/sem  
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat-test"
+  id: semerp-asfat-test
+  name: SEMERP (ASFAT TEST)
+- type: http
+  schedule: '@every 5m'
+  urls:
+    - http://orkestra-integration-provider.sem-test.svc.cluster.local:8080/health  
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat-test"
+  id: orkestra-integration-provider-test
+  name: ORKESTRA INTEGRATION (ASFAT TEST)
+- type: http
+  schedule: '@every 5m'
+  urls:
+    - http://ekap-banned-query-service.sem-test.svc.cluster.local:8080/health  
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat-test"
+  id: ekap-banned-query-service-test
+  name: EKAP Service (ASFAT TEST)
+output.elasticsearch:
+  hosts: ['http://elastic.semerp.com:9202']
+  username: elastic
+  password: sem2023.*
+http.enabled: true
+http.host: 0.0.0.0
+setup.kibana:
+  host: http://kibana.semerp.com:5601
+  username: elastic
+  password: sem2023.*

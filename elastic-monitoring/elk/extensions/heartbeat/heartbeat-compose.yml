@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  heartbeat:
+    build:
+      context: extensions/heartbeat/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    # Run as 'root' instead of 'filebeat' (uid 1000) to allow reading
+    # 'docker.sock' and the host's filesystem.
+    user: root
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command:
+      # Log to stderr.
+      - -e
+      # Disable config file permissions checks. Allows mounting
+      # 'config/heartbeat.yml' even if it's not owned by root.
+      # see: https://www.elastic.co/guide/en/beats/libbeat/current/config-file-permissions.html
+      - --strict.perms=false
+    volumes:
+      - ./extensions/heartbeat/config/heartbeat.yml:/usr/share/heartbeat/heartbeat.yml:ro,Z
+      # (!) CA certificate. Generate using instructions from tls/README.md
+      - ./tls/kibana/elasticsearch-ca.pem:/usr/share/heartbeat/elasticsearch-ca.pem:ro,z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      ELASTICSEARCH_HOST: elasticsearch
+      KIBANA_HOST: kibana
+      #      KIBANA_SYSTEM_USERNAME: kibana_system
+      KIBANA_SYSTEM_USERNAME: elastic
+      #      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${ELASTIC_PASSWORD:-}
+    networks:
+      - elk
+#    network_mode: "host"
+    depends_on:
+      - elasticsearch
+      - kibana
+    deploy:
+      resources:
+        limits:
+          cpus: 0.20
+    restart: unless-stopped

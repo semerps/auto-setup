@@ -1,0 +1,163 @@
+version: "2.2"
+
+services:
+  hearbeat:
+    image: docker.elastic.co/beats/heartbeat:${STACK_VERSION}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ${BEAT_PATH}/heartbeat/config/heartbeat.yml:/usr/share/heartbeat/heartbeat.yml:ro,Z
+      - ${ELASTICPATH}/certs:/usr/share/heartbeat/config/certs
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=https://192.168.6.113:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+      - KIBANA_HOSTS=http://192.168.6.113:7600
+      - KIBANA_SYSTEM_USERNAME=kibana_system
+      - KIBANA_SYSTEM_PASSWORD=${KIBANA_PASSWORD}
+#    mem_limit: ${MEM_LIMIT}
+    restart: unless-stopped
+
+  docker-compose -f heartbeat-compose.yml
+
+
+#docker run --name=heartbeat --user=heartbeat --volume="$(pwd)/beats/heartbeat/config/heartbeat.yml:/usr/share/heartbeat/heartbeat.yml:ro" --volume="$(pwd)/certs:/usr/share/heartbeat --cap-add=NET_RAW docker.elastic.co/beats/heartbeat:8.6.2 setup -E setup.kibana.host=192.168.6.113:7600 -E output.elasticsearch.hosts=["https://192.168.6.113:9200"]  -E output.elasticsearch.ssl.certificate_authorities: [ "/usr/share/heartbeat/ca/ca.crt" ] -E output.elasticsearch.ssl.certificate: "/usr/share/heartbeat/es01/es01.crt" -E output.elasticsearch.ssl.key: "/usr/share/heartbeat/es01/es01.key"
+
+### Heartbeat configuration
+### https://github.com/elastic/beats/blob/main/deploy/docker/heartbeat.docker.yml
+##
+#
+#heartbeat.monitors:
+#
+#  - type: http
+#    id: sem-erp-production
+#    name: SEM ERP (Production)
+#    hosts: ["http://192.168.6.110:30080/sem"]
+#    check.request.method: HEAD
+#    check.response.status: [200]
+#    schedule: '@every 60s'
+#
+#  - type: http
+#    id: sem-erp-main-test
+#    name: SEM ERP (Main Test)
+#    hosts: ["http://192.168.5.53:31620/sem"]
+#    check.request.method: HEAD
+#    check.response.status: [200]
+#    schedule: '@every 60s'
+#
+#  - type: http
+#    id: sem-erp-ahmed-test
+#    name: SEM ERP (Ahmed Test)
+#    hosts: ["http://192.168.5.53:31623/sem"]
+#    check.request.method: HEAD
+#    check.response.status: [200]
+#    schedule: '@every 60s'
+#
+#  - type: tcp
+#    schedule: '@every 60s'
+#    hosts:
+#      - 192.168.6.112:1433
+#    mode: any
+#    id: sql-server
+#    name: SEM ERP - SQL Server
+#
+#  - type: http
+#    id: sem-erp-doc-converter
+#    name: SEM ERP Document Converter
+#    hosts: ["http://192.168.5.53:32193"]
+#    check.request.method: HEAD
+#    check.response.status: [200]
+#    schedule: '@every 60s'
+#
+#  - type: tcp
+#    schedule: '@every 60s'
+#    hosts:
+#      - host.docker.internal:5040
+#    mode: any
+#    id: nlm
+#    name: SEM ERP - NLM
+#
+#  - type: tcp
+#    schedule: '@every 60s'
+#    hosts:
+#      - host.docker.internal:5671
+#    mode: any
+#    id: rabbit-mq
+#    name: SEM ERP - Rabbit MQ
+#
+#  - type: tcp
+#    schedule: '@every 60s'
+#    hosts:
+#      - host.docker.internal:27017
+#    mode: any
+#    id: rabbit-mongo
+#    name: SEM ERP - MONGO Server
+#
+#  - type: tcp
+#    schedule: '@every 60s'
+#    hosts:
+#      - 192.168.6.110:30080
+#    mode: any
+#    id: gant-service
+#    name: SEM ERP - Gant Service
+#
+#
+##- type: http
+##  schedule: '@every 60s'
+##  urls:
+##    - http://host.docker.internal:8080
+##  id: web-server
+##  name: Web Server
+#
+#
+#
+##================================ Processors ===================================
+#processors:
+#  - add_cloud_metadata: ~
+#  - add_docker_metadata: ~
+#  - add_locale:
+#      format: offset
+#  - add_host_metadata:
+#      netinfo.enabled: true
+##  - add_observer_metadata:
+##      # Optional, but recommended geo settings for the location Heartbeat is running in
+##      geo:
+##        # Token describing this location
+##        name: us-east-1a
+##        # Lat, Lon "
+##        #location: "37.926868, -78.024902"
+#
+##========================== Elasticsearch output ===============================
+#output.elasticsearch:
+#  hosts: '${ELASTICSEARCH_HOSTS:0.0.0.0:9200}'
+#  username: '${ELASTICSEARCH_USERNAME:}'
+#  password: '${ELASTICSEARCH_PASSWORD:}'
+##  hosts: ['http://elasticsearch:9200']
+##  username: elastic
+##  password: ${ELASTIC_PASSWORD}
+##  ssl:
+##    certificate_authorities: ['${path.home}/elasticsearch-ca.pem']
+#
+### HTTP endpoint for health checking
+### https://www.elastic.co/guide/en/beats/metricbeat/current/http-endpoint.html
+##
+#
+#http.enabled: true
+#http.host: 0.0.0.0
+#
+##============================== Dashboards =====================================
+##setup.dashboards:
+##  directory: /usr/share/heartbeat/kibana
+##  enabled: true
+##
+#
+#
+##============================== Kibana =========================================
+#setup.kibana:
+#  hosts: '${KIBANA_HOSTS:0.0.0.0:5601}'
+#  username: '${KIBANA_SYSTEM_USERNAME:}'
+#  password: '${KIBANA_SYSTEM_PASSWORD:}'
+
+#docker run docker.elastic.co/beats/heartbeat:8.6.2 --name=heartbeat --user=heartbeat --volume="$(pwd)/elastic/heartbeat/config.yml:/usr/share/heartbeat/heartbeat.yml:ro" setup -E setup.kibana.host=0.0.0.0:7600-E setup.kibana.username="elastic" -E setup.kibana.password="Sem2023." -E output.elasticsearch.hosts=["0.0.0.0:9200"] -E output.elasticsearch.username="elastic" -E output.elasticsearch.password="Sem2023."
