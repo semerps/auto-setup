@@ -170,10 +170,10 @@ else
     #sudo microk8s enable istio
 
     # kubectl için alias'ı ekleyin
-    echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc && source ~/.bashrc
-    newgrp microk8s
-    usermod -a -G microk8s $USER
-    chown -R $USER ~/.kube
+    #echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc && source ~/.bashrc
+    #newgrp microk8s
+    #usermod -a -G microk8s $USER
+    #chown -R $USER ~/.kube
 
     microk8s.kubectl create namespace $namespace
 
@@ -243,6 +243,9 @@ else
     mssql_gantt_db="sem_gantt"
 
     print_message "MSSQL sunucusu sizin için kuruluyor..."
+    sed -i "s|MSSQL_PASSWORD|$mssql_pass|g" files/mssql/backupJob.yaml
+    sed -i "s|NAME_SPACE|$namespace|g" files/mssql/backupJob.yaml
+    sed -i "s|DB_NAMES_TO_BACKUP|$mssql_sem_db,$mssql_gantt_db|g" files/mssql/backupJob.yaml
     sed -i "s|MSSQL_PASSWORD|$mssql_pass|g" files/mssql/deployment.yaml
     sed -i "s|MSSQL_DATA_PATH|$CURRENT_DIR/files/mssql/data|g" files/mssql/storage.yaml
     microk8s.kubectl apply -f files/mssql/ -n $namespace

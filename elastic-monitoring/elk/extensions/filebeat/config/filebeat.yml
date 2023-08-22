@@ -1,0 +1,99 @@
+## Filebeat configuration
+## https://github.com/elastic/beats/blob/main/deploy/docker/filebeat.docker.yml
+#
+
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+# https://github.com/elastic/beats/blob/master/filebeat/filebeat.reference.yml
+
+filebeat.modules:
+  - module: system
+    syslog:
+      enabled: true
+    auth:
+      enabled: true
+
+#docker
+#  - module: auditd
+#    log:
+#      # - Does not look like Auditd is supported in Alpine linux: https://github.com/linuxkit/linuxkit/issues/52
+#      # - CentOS does not need us to install the audit system, it ships as standard. If you are using Ubuntu, though,
+#      # this is probably something you would want to install. (sudo apt-get install -y auditd audispd-plugins)
+#      enabled: false
+
+filebeat.inputs:
+#  - type: container
+#    enabled: true
+#    paths:
+#      -/var/lib/docker/containers/*/*.log
+#    stream: all # can be all, stdout or stderr
+
+  - type: log
+    # Change to true to enable this input configuration.
+    enabled: true
+
+    # Paths that should be crawled and fetched. Glob based paths.
+    # To fetch all ".log" files from a specific level of subdirectories
+    # /var/log/*/*.log can be used.
+    # For each file found under this path, a harvester is started.
+    # Make sure not file is defined twice as this can lead to unexpected behaviour.
+    paths:
+      - ${LOG_FILE_PATH}
+      #      - D:\Go\tutorials\logging\out.log
+    #    - /logs/*.log
+    #    - out.log
+
+    json:
+      keys_under_root: true
+      overwrite_keys: true
+      message_key: 'message'
+
+##========================== Filebeat autodiscover ==============================
+## See this URL on how to run Apache2 Filebeat module: # https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
+filebeat.autodiscover:
+  providers:
+    # The Docker autodiscover provider automatically retrieves logs from Docker
+    # containers as they start and stop.
+    - type: docker
+      hints.enabled: true
+
+
+#================================ Processors ===================================
+processors:
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_locale:
+      format: offset
+  - add_host_metadata:
+      netinfo.enabled: true
+
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: ['http://elasticsearch:9200']
+  username: elastic
+  password: ${ELASTIC_PASSWORD}
+  ssl:
+    certificate_authorities: ['${path.home}/elasticsearch-ca.pem']
+
+## HTTP endpoint for health checking
+## https://www.elastic.co/guide/en/beats/metricbeat/current/http-endpoint.html
+#
+
+http.enabled: true
+http.host: 0.0.0.0
+
+#============================== Dashboards =====================================
+setup.dashboards:
+  enabled: true
+
+
+#============================== Kibana =========================================
+setup.kibana:
+  host: ${KIBANA_HOST}
+  #  protocol: "https"
+  #  ssl.enabled: true
+  username: ${KIBANA_SYSTEM_USERNAME}
+  password: ${KIBANA_SYSTEM_PASSWORD}

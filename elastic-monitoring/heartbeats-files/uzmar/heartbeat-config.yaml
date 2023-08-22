@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heartbeat-config
+  namespace: uzmar
+data:
+  heartbeat.yml: |
+    heartbeat.monitors:
+    - type: http
+      schedule: '@every 10m'
+      urls:
+        - http://semerp-uzmar.uzmar.svc.cluster.local:8090/sem
+      data_stream:
+        dataset: "heartbeat"
+        namespace: "uzmar"
+      id: semerp-uzmar
+      name: SEMERP (UZMAR)  
+    - type: http
+      schedule: '@every 10m'
+      urls:
+        - http://analytics.uzmar.com:5040
+      data_stream:
+        dataset: "heartbeat"
+        namespace: "uzmar"
+      id: nlm-uzmar
+      name: NLM (UZMAR)
+    - type: tcp
+      schedule: '@every 10m'
+      hosts: ["192.168.34.67"]
+      ports: [1433]
+      data_stream:
+        dataset: "heartbeat"
+        namespace: "uzmar"
+      id: mssql-uzmar
+      name: MSSQL (UZMAR)
+    - type: tcp
+      schedule: '@every 10m'
+      hosts: ["192.168.34.4"]
+      ports: [5672]
+      data_stream:
+        dataset: "heartbeat"
+        namespace: "uzmar"
+      id: rabbitmq-uzmar
+      name: RabbitMQ (UZMAR)
+    output.elasticsearch:
+      hosts: ['http://elastic.semerp.com:9202']
+      username: elastic
+      password: sem2023.*
+    http.enabled: true
+    http.host: 0.0.0.0
+    setup.kibana:
+      host: http://kibana.semerp.com:5601
+      username: elastic
+      password: sem2023.*
+
+
+

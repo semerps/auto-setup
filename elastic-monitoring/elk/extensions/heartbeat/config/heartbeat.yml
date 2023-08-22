@@ -1,0 +1,210 @@
+## Heartbeat configuration
+## https://github.com/elastic/beats/blob/main/deploy/docker/heartbeat.docker.yml
+#
+
+heartbeat.monitors:
+
+
+- type: tcp
+  schedule: '@every 60s'
+  hosts:
+    - 192.32.24.200:502
+  mode: any
+  id: ams-modbus
+  name: AMS Modbus
+
+- type: tcp
+  schedule: '@every 60s'
+  hosts:
+    - 192.168.16.10:4001
+  mode: any
+  id: vdms-dcu-touch-panel
+  name: VDMS DCU Touch Panel
+
+- type: tcp
+  schedule: '@every 60s'
+  hosts:
+    - 192.168.16.10:4002
+  mode: any
+  id: nmea-speed-log1
+  name: NMEA Speed Log 1
+
+- type: tcp
+  schedule: '@every 60s'
+  hosts:
+    - 192.168.16.10:4003
+  mode: any
+  id: nmea-satalite-compass
+  name: NMEA Satalite Compass
+
+- type: tcp
+  schedule: '@every 60s'
+  hosts:
+    - 192.168.16.10:4004
+  mode: any
+  id: nmea-wind-speed
+  name: NMEA Wind Speed
+
+- type: tcp
+  schedule: '@every 60s'
+  hosts:
+    - 192.168.16.11:4002
+  mode: any
+  id: nmea-speed-log2
+  name: NMEA Speed Log 2
+
+- type: tcp
+  schedule: '@every 60s'
+  hosts:
+    - 192.168.16.11:4003
+  mode: any
+  id: nmea-gps
+  name: NMEA GPS
+
+- type: tcp
+  schedule: '@every 60s'
+  hosts:
+    - 192.168.16.11:4004
+  mode: any
+  id: nmea-ais
+  name: NMEA AIS
+
+- type: http
+  schedule: '@every 60s'
+  urls:
+    - http://host.docker.internal:3001
+  id: grafana
+  name: Grafana
+
+- type: http
+  schedule: '@every 60s'
+  urls:
+    - http://host.docker.internal:8086
+  id: influx-db
+  name: Influx DB
+
+- type: http
+  schedule: '@every 60s'
+  urls:
+    - http://elasticsearch:9200
+  username: elastic
+  password: ${ELASTIC_PASSWORD}
+  ssl:
+    certificate_authorities: ['${path.home}/elasticsearch-ca.pem']
+  id: elastic-search
+  name: Elastic Search
+
+- type: http
+  schedule: '@every 60s'
+  urls:
+    - http://host.docker.internal:5601
+  username: ${KIBANA_SYSTEM_USERNAME}
+  password: ${KIBANA_SYSTEM_PASSWORD}
+  id: kibana
+  name: Kibana
+
+- type: http
+  schedule: '@every 60s'
+  urls:
+    - http://host.docker.internal:8080
+  id: web-server
+  name: Web Server
+
+
+
+
+#
+#- type: http
+#  schedule: '@every 60s'
+#  urls:
+#    - http://elasticsearch:9200
+#  username: elastic
+#  password: ${ELASTIC_PASSWORD}
+#  ssl:
+#    certificate_authorities: ['${path.home}/elasticsearch-ca.pem']
+#  id: elastic-service
+#  name: Elastic Search Service
+#
+#- type: icmp
+#  schedule: '@every 30s'
+#  hosts:
+#    - elasticsearch
+#  id: elastic-service-icmp
+#  name: Elastic Search Service (ICMP)
+#
+#- type: tcp
+#  schedule: '@every 60s'
+#  hosts:
+#    - host.docker.internal:502
+#  mode: any
+#  id: modbus-service
+#  name: Modbus Slave
+#
+#- type: icmp
+#  schedule: '@every 30s'
+#  hosts:
+#    - host.docker.internal
+#  id: modbus-service-icmp
+#  name: Modbus Slave (ICMP)
+#
+#- type: tcp
+#  schedule: '@every 60s'
+#  hosts:
+#    - host.docker.internal:9999
+#  mode: any
+#  id: nmea-simulator-service
+#  name: NMEA Simulator Slave
+#
+#- type: icmp
+#  schedule: '@every 30s'
+#  hosts:
+#    - host.docker.internal
+#  id: nmea-simulator-service-icmp
+#  name: NMEA Simulator Slave (ICMP)
+
+
+#================================ Processors ===================================
+processors:
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_locale:
+      format: offset
+  - add_host_metadata:
+      netinfo.enabled: true
+#  - add_observer_metadata:
+#      # Optional, but recommended geo settings for the location Heartbeat is running in
+#      geo:
+#        # Token describing this location
+#        name: us-east-1a
+#        # Lat, Lon "
+#        #location: "37.926868, -78.024902"
+
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: ['http://elasticsearch:9200']
+  username: elastic
+  password: ${ELASTIC_PASSWORD}
+  ssl:
+    certificate_authorities: ['${path.home}/elasticsearch-ca.pem']
+
+## HTTP endpoint for health checking
+## https://www.elastic.co/guide/en/beats/metricbeat/current/http-endpoint.html
+#
+
+http.enabled: true
+http.host: 0.0.0.0
+
+#============================== Dashboards =====================================
+#setup.dashboards:
+#  directory: /usr/share/heartbeat/kibana
+#  enabled: true
+#
+
+
+#============================== Kibana =========================================
+setup.kibana:
+  host: ${KIBANA_HOST}
+  #  protocol: "https"
+  #  ssl.enabled: true
+  username: ${KIBANA_SYSTEM_USERNAME}
+  password: ${KIBANA_SYSTEM_PASSWORD}

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heartbeat-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heartbeat
+  template:
+    metadata:
+      labels:
+        app: heartbeat
+    spec:
+      containers:
+      - name: heartbeat
+        image: docker.elastic.co/beats/heartbeat:8.4.1
+        args:
+        - -e
+        - -E
+        - heartbeat.config.monitoring.enabled=false
+        - -E
+        - heartbeat.config.output.elasticsearch.enabled=true
+        volumeMounts:
+        - name: heartbeat-config-volume
+          mountPath: /usr/share/heartbeat/heartbeat.yml
+          subPath: heartbeat.yml
+      volumes:
+      - name: heartbeat-config-volume
+        configMap:
+          name: heartbeat-config
+          items:
+          - key: heartbeat.yml
+            path: heartbeat.yml

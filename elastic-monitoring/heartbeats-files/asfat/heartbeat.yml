@@ -1,0 +1,73 @@
+heartbeat.monitors:
+- type: http
+  schedule: '@every 10m'
+  urls:
+    - http://semerp-asfat.sem.svc.cluster.local:8090/sem  
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat"
+  id: semerp-asfat
+  name: SEMERP (ASFAT)
+- type: http
+  schedule: '@every 10m'
+  urls:
+    - http://orkestra-integration-provider.sem.svc.cluster.local:8080/health  
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat"
+  id: orkestra-integration-provider-asfat
+  name: ORKESTRA INTEGRATION (ASFAT)
+- type: http
+  schedule: '@every 10m'
+  urls:
+    - http://192.168.6.113:8080/health  
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat"
+  id: ekap-banned-query-service-asfat
+  name: EKAP Service (ASFAT)
+- type: http
+  schedule: '@every 10m'
+  urls:
+    - http://192.168.6.113:15672/
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat"
+  id: rabbitmq-asfat
+  name: RabbitMQ  (ASFAT)
+- type: tcp
+  schedule: '@every 10m'
+  hosts: ["192.168.6.112"]
+  ports: [1433]
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat"
+  id: mssql-asfat
+  name: MSSQL (ASFAT)
+- type: tcp
+  schedule: '@every 10m'
+  hosts: ["192.168.6.113:27017"]  
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat"
+  id: mongodb-asfat
+  name: MongoDB (ASFAT)
+- type: http
+  schedule: '@every 10m'
+  urls:
+    - https://semanalytics.asfat.com.tr:5040
+  data_stream:
+    dataset: "heartbeat"
+    namespace: "asfat"
+  id: nlm-asfat
+  name: NLM (ASFAT)
+output.elasticsearch:
+  hosts: ['http://elastic.semerp.com:9202']
+  username: elastic
+  password: sem2023.*
+http.enabled: true
+http.host: 0.0.0.0
+setup.kibana:
+  host: http://kibana.semerp.com:5601
+  username: elastic
+  password: sem2023.*

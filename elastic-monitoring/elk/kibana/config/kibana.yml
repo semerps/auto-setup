@@ -1,0 +1,36 @@
+---
+## Default Kibana configuration from Kibana base image.
+## https://github.com/elastic/kibana/blob/main/src/dev/build/tasks/os_packages/docker_generator/templates/kibana_yml.template.ts
+#
+server.name: kibana
+server.host: 0.0.0.0
+#elasticsearch.hosts: [ "${ELASTIC_HOST}" ]
+elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+monitoring.ui.container.elasticsearch.enabled: true
+#xpack.security.encryptionKey: "675433e6-d1e3-413a-97b1-7a41f5cbc50f"
+xpack.encryptedSavedObjects.encryptionKey: "675433e6-d1e3-413a-97b1-7a41f5cbc50f"
+## X-Pack security credentials
+#
+elasticsearch.username: kibana_system
+elasticsearch.password: ${KIBANA_SYSTEM_PASSWORD}
+
+##
+## TLS configuration
+## See instructions from README to enable.
+##
+
+## Communications between Kibana and Elasticsearch
+## see https://www.elastic.co/guide/en/kibana/current/configuring-tls.html#configuring-tls-kib-es
+#
+elasticsearch.ssl.certificateAuthorities: [ config/elasticsearch-ca.pem ]
+
+## Communications between web browsers and Kibana
+## see https://www.elastic.co/guide/en/kibana/current/configuring-tls.html#configuring-tls-browser-kib
+#
+server.ssl.enabled: false
+server.ssl.certificate: config/instance.crt
+server.ssl.key: config/instance.key
+
+# Time in milliseconds to wait for responses from the back end or Elasticsearch. This value
+# must be a positive integer.
+elasticsearch.requestTimeout: 120000
