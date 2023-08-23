@@ -25,7 +25,18 @@ heartbeat.monitors:
     dataset: "heartbeat"
     namespace: "uzmar-bilisim"
   id: rabbitmq-bilisim
-  name: RabbitMQ (UZMAR BİLİŞİM) 
+  name: RabbitMQ (UZMAR BİLİŞİM)
+processors:
+    - add_observer_metadata:
+      cache.ttl: 10m
+      geo:
+        name: uzmar-bilisim
+        location: 40.7043395, 29.8835198
+        continent_name: Asia
+        country_iso_code: TR
+        region_name: Turkey
+        region_iso_code: K
+        city_name: Kocaeli
 output.elasticsearch:
   hosts: ['http://elastic.semerp.com:9202']
   username: elastic

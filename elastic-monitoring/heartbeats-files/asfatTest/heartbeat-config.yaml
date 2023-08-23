@@ -33,6 +33,17 @@ data:
         namespace: "asfat-test"
       id: ekap-banned-query-service-test
       name: EKAP Service (ASFAT TEST)
+    processors:
+      - add_observer_metadata:
+          cache.ttl: 10m
+          geo:
+            name: asfat-test
+            location: 39.896520, 32.861970
+            continent_name: Asia
+            country_iso_code: TR
+            region_name: Turkey
+            region_iso_code: ANK
+            city_name: Ankara
     output.elasticsearch:
       hosts: ['http://elastic.semerp.com:9202']
       username: elastic

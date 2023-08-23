@@ -42,6 +42,17 @@ data:
         namespace: "uzmar"
       id: rabbitmq-uzmar
       name: RabbitMQ (UZMAR)
+    processors:
+      - add_observer_metadata:
+          cache.ttl: 10m
+          geo:
+            name: uzmar
+            location: 40.7209248, 29.8659619
+            continent_name: Asia
+            country_iso_code: TR
+            region_name: Turkey
+            region_iso_code: K
+            city_name: Kocaeli
     output.elasticsearch:
       hosts: ['http://elastic.semerp.com:9202']
       username: elastic
