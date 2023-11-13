@@ -45,5 +45,29 @@ module.exports = {
       exchange: "sem-scheduler",
       elasticIndex: "sem-exceptions",
     },
+    // {
+    //   queueName: "nlm-sem-asfat-eys-approvement-dlx",
+    //   routeKey: "asfat.eys.approvement.dlx.*",
+    //   exchange: "sem-dlx",
+    //   elasticIndex: "asfat-eys-approvement-dlx",
+    // },
+    // {
+    //   queueName: "nlm-sem-asfat-eys-approvement",
+    //   routeKey: "asfat.eys.approvement.*",
+    //   exchange: "sem-scheduler",
+    //   elasticIndex: "asfat-eys-approvement",
+    // },
+    // {
+    //   queueName: "nlm-sem-orkestra-personnel-dlx",
+    //   routeKey: "orkestra.personnel.dlx.*",
+    //   exchange: "sem-dlx",
+    //   elasticIndex: "orkestra-personnel-dlx",
+    // },
+    // {
+    //   queueName: "nlm-sem-orkestra-personnel",
+    //   routeKey: "orkestra.personnel.*",
+    //   exchange: "sem-integration",
+    //   elasticIndex: "orkestra-personnel",
+    // },
   ],
 };
