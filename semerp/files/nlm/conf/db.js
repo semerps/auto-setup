@@ -23,7 +23,7 @@ module.exports = {
     password: "pass",
   },
   amqp: {
-    uri: "amqp://uzmartech:Sem123654%40@rabbitmq.semerp.svc.cluster.local:5672/semerp",
+    uri: "amqp://uzmartech:Sem123654@@rabbitmq.semerp.svc.cluster.local:5672/semerp",
   },
   elasticSearch: {
     node: "https://elasticsearch.namespace.svc.cluster.local:9200",

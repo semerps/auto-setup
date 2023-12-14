@@ -67,7 +67,7 @@ upsert_config() {
     echo "Config key '${config_key}' updated with value '${config_value}'."
   else
     # Eğer anahtar yoksa anahtarı ekler
-    local insert_query="INSERT INTO dbo.sys_config (config_key, config_value) VALUES ('${config_key}', '${config_value}');"
+    local insert_query="INSERT INTO dbo.sys_config (config_key, config_value, version, created_by_id, date_created) VALUES ('${config_key}', '${config_value}', 0, 1, GETDATE());"
     sql_exec "${insert_query}" "${mssql_sem_db}"
     echo "Config key '${config_key}' added with value '${config_value}'."
   fi
@@ -282,10 +282,10 @@ print_message "RabbitMQ sunucusu kurulumu tamamlandı."
 #------------------RabbitMQ Kurulumu----------------------------!>
 
 #<!------------------EKAP Banned Service Kurulumu----------------------------
-print_message "EKAP Banned Servisi sizin için kuruluyor..."
-microk8s.kubectl apply -f files/ekap/ -n $namespace
-wait_for_pod $namespace ekap
-print_message "EKAP Banned Servisi kurulumu tamamlandı."
+#print_message "EKAP Banned Servisi sizin için kuruluyor..."
+#microk8s.kubectl apply -f files/ekap/ -n $namespace
+#wait_for_pod $namespace ekap
+#print_message "EKAP Banned Servisi kurulumu tamamlandı."
 #------------------RabbitMQ Kurulumu----------------------------!>
 
 #<!------------------Redis Kurulumu----------------------------
@@ -331,7 +331,6 @@ upsert_config company.title "$ref_params"
 if [ "$choice" = "1" ]; then
 print_message "SEM ERP hizmeti kurulmuştur \n Erişim için http://$ip_address:30080/sem adresini kullanabilirsiniz. "
 exit 1
-;;
 fi
 
 
@@ -373,7 +372,7 @@ sed -i "s|mongodb_username|$mongodb_username|g" files/mongo/deployment.yaml
 sed -i "s|mongodb_password|$mongodb_password|g" files/mongo/deployment.yaml
 
 microk8s.kubectl apply -f files/mongo/ -n $namespace
-wait_for_pod $namespace mongo
+wait_for_pod $namespace mongodb
 #mongo kurulduktan sonra bu pod a bağlanarak yeni bir db oluşturma işlemi yapılacak
 microk8s.kubectl exec -it -n "${namespace}" "deployment/mongodb" -- mongo "sem" -u "${mongodb_username}" -p "${mongodb_password}" --authenticationDatabase admin --eval "db.createCollection('init')"
 
@@ -382,7 +381,7 @@ print_message "Mongo sunucusu kurulumu tamamlandı."
 
 #<!-----------------NLM Kurulumu----------------------------
 print_message "NLM sunucusu sizin için kuruluyor..."
-sed -i "s|NLM_PATH|$CURRENT_DIR/files/nlm|g" files/mongo/storage.yaml
+sed -i "s|NLM_PATH|$CURRENT_DIR/files/nlm|g" files/nlm/storage.yaml
 sed -i "s|mongodb_username|$mongodb_username|g" files/nlm/conf/db.js
 sed -i "s|mongodb_password|$mongodb_password|g" files/nlm/conf/db.js
 sed -i "s|namespace|$namespace|g" files/nlm/conf/db.js
