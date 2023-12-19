@@ -76,7 +76,9 @@ upsert_config() {
 #Database oluşturma fonksiyonu
 create_database() {
   local database="$1"
-  local sql="CREATE DATABASE [${database}];"
+  local collation="Turkish_CI_AS"  # Specify the desired collation, e.g., Turkish (case-insensitive, accent-sensitive)
+
+  local sql="CREATE DATABASE [${database}] COLLATE ${collation};"
   sql_exec "${sql}"
 }
 
@@ -85,9 +87,11 @@ restore_database() {
   # Parametreleri ayarla
   local BACKUP_FILE="$1"
   local DATABASE="$2"
+  local collation="Turkish_CI_AS"  # Specify the desired collation, e.g., Turkish (case-insensitive, accent-sensitive)
+
 
   # Veritabanının var olup olmadığını kontrol etme
-  local SQL_CHECK_DB="IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '${DATABASE}') CREATE DATABASE [${DATABASE}];"
+  local SQL_CHECK_DB="IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '${DATABASE}') CREATE DATABASE [${DATABASE}] COLLATE ${collation};"
 
   # Veritabanını kontrol et ve gerekiyorsa oluştur
   sql_exec "${SQL_CHECK_DB}"
