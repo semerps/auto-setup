@@ -1,0 +1,231 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sem-share-demo-pv
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/administrator/semerp-demo/files/anamar-upload
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sem-tomcat-demo-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/administrator/semerp-demo/files/conf
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sem-share-demo-pvc
+spec:
+  storageClassName: ""
+  volumeName: sem-share-demo-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sem-tomcat-demo-pvc
+spec:
+  storageClassName: ""
+  volumeName: sem-tomcat-demo-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sem-jvmsecurity-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/administrator/semerp-demo/files/jvmsecurity
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sem-jvmsecurity-pvc
+spec:
+  storageClassName: ""
+  volumeName: sem-jvmsecurity-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sem-fonts-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/administrator/semerp-demo/files/fonts
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sem-fonts-pvc
+spec:
+  storageClassName: ""
+  volumeName: sem-fonts-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sem-logsdir-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/administrator/semerp-demo/files/logs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sem-logsdir-pvc
+spec:
+  storageClassName: ""
+  volumeName: sem-logsdir-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: semerp-demo
+  name: semerp-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: semerp-demo
+  template:
+    metadata:
+      labels:
+        run: semerp-demo
+    spec:
+      dnsPolicy: ClusterFirst
+      volumes:
+        - name: shareddir
+          persistentVolumeClaim:
+            claimName: sem-share-demo-pvc
+        - name: confdir
+          persistentVolumeClaim:
+            claimName: sem-tomcat-demo-pvc
+        - name: jvmsecurity
+          persistentVolumeClaim:
+            claimName: sem-jvmsecurity-pvc
+        - name: fonts
+          persistentVolumeClaim:
+            claimName: sem-fonts-pvc
+        - name: logsdir
+          persistentVolumeClaim:
+            claimName: sem-logsdir-pvc
+      containers:
+        - image: semerp/sem-erp:latest
+          name: semerp
+          imagePullPolicy: Always
+          #        resources:
+          #          limits:
+          #            memory: "20Gi"
+          #            cpu: "6000m"
+          ports:
+            - containerPort: 8090
+              name: http
+            - containerPort: 443
+              name: https
+            - containerPort: 8009
+              name: ajp
+            - containerPort: 5000
+              name: jmx
+          volumeMounts:
+            - name: shareddir
+              mountPath: "/var/opt/semerp"
+            - name: confdir
+              mountPath: "/usr/local/tomcat/conf"
+            - name: logsdir
+              mountPath: "/usr/local/tomcat/logs"
+            - name: jvmsecurity
+              mountPath: "/usr/local/openjdk-8/jre/lib/security"
+            - name: fonts
+              mountPath: "/usr/local/openjdk-8/jre/lib/fonts"
+          env:
+            - name: JAVA_OPTS
+              value: "-Duser.timezone=Europe/Istanbul -Dsem.basepath=http://127.0.0.1:8090/sem -Dsem.username=Administrator -Dsem.password=1 -Dbryntum.db=jdbc/GanttDb"
+            - name: CATALINA_OPTS
+              value: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.rmi.port=5000 -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote.ssl=false
+          startupProbe:
+            httpGet:
+              path: /sem
+              port: 8090
+            failureThreshold: 50
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /sem
+              port: 8090
+            initialDelaySeconds: 200
+            periodSeconds: 10
+            failureThreshold: 30
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: semerp-demo
+spec:
+  type: NodePort
+  ports:
+    - port: 8090
+      targetPort: 8090
+      nodePort: 30082
+      name: http
+    - port: 443
+      targetPort: 443
+      name: https
+    - port: 8009
+      targetPort: 8009
+      name: ajp
+  selector:
+    run: semerp-demo
