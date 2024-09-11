@@ -53,7 +53,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sem-jvmsecurity-pv
+  name: sem-jvmsecurity-demo-pv
 spec:
   capacity:
     storage: 1Gi
@@ -66,10 +66,10 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: sem-jvmsecurity-pvc
+  name: sem-jvmsecurity-demo-pvc
 spec:
   storageClassName: ""
-  volumeName: sem-jvmsecurity-pv
+  volumeName: sem-jvmsecurity-demo-pv
   accessModes:
     - ReadWriteOnce
   resources:
@@ -79,7 +79,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sem-fonts-pv
+  name: sem-fonts-demo-pv
 spec:
   capacity:
     storage: 1Gi
@@ -92,10 +92,10 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: sem-fonts-pvc
+  name: sem-fonts-demo-pvc
 spec:
   storageClassName: ""
-  volumeName: sem-fonts-pv
+  volumeName: sem-fonts-demo-pv
   accessModes:
     - ReadWriteOnce
   resources:
@@ -105,7 +105,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sem-logsdir-pv
+  name: sem-logsdir-demo-pv
 spec:
   capacity:
     storage: 1Gi
@@ -118,10 +118,10 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: sem-logsdir-pvc
+  name: sem-logsdir-demo-pvc
 spec:
   storageClassName: ""
-  volumeName: sem-logsdir-pv
+  volumeName: sem-logsdir-demo-pv
   accessModes:
     - ReadWriteOnce
   resources:
@@ -154,15 +154,15 @@ spec:
             claimName: sem-tomcat-demo-pvc
         - name: jvmsecurity
           persistentVolumeClaim:
-            claimName: sem-jvmsecurity-pvc
+            claimName: sem-jvmsecurity-demo-pvc
         - name: fonts
           persistentVolumeClaim:
-            claimName: sem-fonts-pvc
+            claimName: sem-fonts-demo-pvc
         - name: logsdir
           persistentVolumeClaim:
-            claimName: sem-logsdir-pvc
+            claimName: sem-logsdir-demo-pvc
       containers:
-        - image: semerp/sem-erp:latest
+        - image: semerp/sem-erp:demo
           name: semerp
           imagePullPolicy: Always
           #        resources:
