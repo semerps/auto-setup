@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sem-office-server
+  labels:
+    app: sem-office-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sem-office-server
+  template:
+    metadata:
+      labels:
+        app: sem-office-server
+    spec:
+      containers:
+        - name: sem-office-server
+          image: semerp/office-server
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          env:
+            - name: JWT_ENABLED
+              value: "false"
+            - name: JWT_SECRET
+              value: ""
+            - name: ALLOW_PRIVATE_IP_ADDRESS
+              value: "true"
+            - name: ALLOW_META_IP_ADDRESS
+              value: "true"
+          volumeMounts:
+            - name: data-volume
+              mountPath: /var/www/onlyoffice/Data
+            - name: lib-volume
+              mountPath: /var/lib/onlyoffice
+            - name: db-volume
+              mountPath: /var/lib/postgresql
+            - name: logs-volume
+              mountPath: /var/log/onlyoffice
+            - name: rabbitmq-volume
+              mountPath: /var/lib/rabbitmq
+            - name: redis-volume
+              mountPath: /var/lib/redis
+            - name: fonts-volume
+              mountPath: /usr/share/fonts/truetype/custom
+      volumes:
+        - name: data-volume
+          hostPath:
+            path: /Users/aydinozturk/Projects/office-server/DockerData/data
+        - name: lib-volume
+          hostPath:
+            path: /Users/aydinozturk/Projects/office-server/DockerData/lib
+        - name: db-volume
+          hostPath:
+            path: /Users/aydinozturk/Projects/office-server/DockerData/db
+        - name: logs-volume
+          hostPath:
+            path: /Users/aydinozturk/Projects/office-server/DockerData/logs
+        - name: rabbitmq-volume
+          hostPath:
+            path: /Users/aydinozturk/Projects/office-server/DockerVolumes/rabbitmq
+        - name: redis-volume
+          hostPath:
+            path: /Users/aydinozturk/Projects/office-server/DockerVolumes/redis
+        - name: fonts-volume
+          hostPath:
+            path: /Users/aydinozturk/Projects/office-server/DockerVolumes/fonts
