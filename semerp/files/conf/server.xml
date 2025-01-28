@@ -8,11 +8,11 @@
   <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
 
   <GlobalNamingResources>
-<!--	  <Resource name="UserDatabase" auth="Container"-->
-<!--                type="org.apache.catalina.UserDatabase"-->
-<!--                description="User database that can be updated and saved"-->
-<!--                factory="org.apache.catalina.users.MemoryUserDatabaseFactory"-->
-<!--                pathname="conf/tomcat-users.xml"/>-->
+	  <Resource name="UserDatabase" auth="Container"
+                type="org.apache.catalina.UserDatabase"
+                description="User database that can be updated and saved"
+                factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+                pathname="conf/tomcat-users.xml"/>
 
 	  <Resource auth="Container" driverClassName="net.sourceforge.jtds.jdbc.Driver"
 				initialSize="5"
@@ -34,6 +34,16 @@
 				testOnBorrow="true" testOnReturn="false" testWhileIdle="true"
 				timeBetweenEvictionRunsMillis="30000" type="javax.sql.DataSource" validationQuery = "SELECT 1"
 				url="jdbc:jtds:sqlserver://MSSQL_ADDRS:MSSQL_PORT;databaseName=MSSQL_GANTT_DB" username="MSSQL_USER" />
+
+	  <Resource auth="Container" driverClassName="net.sourceforge.jtds.jdbc.Driver"
+				initialSize="5" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(threshold=10000)"
+				dialect = "com.anamar.dialect.MSSQLDialect"
+				jmxEnabled="true" logAbandoned="true" maxActive="200" maxWait="30000"
+				minEvictableIdleTimeMillis="300000" minIdle="5" name="jdbc/GanttDb"
+				password="Sem2023*" removeAbandoned="true" removeAbandonedTimeout="60"
+				testOnBorrow="true" testOnReturn="false" testWhileIdle="true"
+				timeBetweenEvictionRunsMillis="30000" type="javax.sql.DataSource" validationQuery = "SELECT 1"
+				url="jdbc:jtds:sqlserver://mssql.semerp.svc.cluster.local:1433;databaseName=sem_gantt" username="sa" />
 
   </GlobalNamingResources>
 
