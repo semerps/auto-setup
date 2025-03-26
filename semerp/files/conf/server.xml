@@ -13,19 +13,36 @@
                 description="User database that can be updated and saved"
                 factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
                 pathname="conf/tomcat-users.xml"/>
+		<Resource 
+			name="jdbc/SemMsSql"
+			auth="Container"
+			factory="com.zaxxer.hikari.HikariJNDIFactory"
+			type="javax.sql.DataSource"
+			driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+			jdbcUrl="jdbc:sqlserver://MSSQL_ADDRS:MSSQL_PORT;databaseName=MSSQL_SEM_DB"
+			username="MSSQL_USER"
+			password="MSSQL_PASS"
 
-	  <Resource auth="Container" driverClassName="net.sourceforge.jtds.jdbc.Driver"
-				initialSize="5"
-				jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(threshold=10000)"
-				dialect = "com.anamar.dialect.MSSQLDialect"
-				jmxEnabled="true" logAbandoned="true" maxActive="200" maxWait="60000"
-				minEvictableIdleTimeMillis="300000" minIdle="5" name="jdbc/SemMsSql"
-				password="MSSQL_PASS" removeAbandoned="true" removeAbandonedTimeout="60"
-				testOnBorrow="true" testOnReturn="false" testWhileIdle="true"
-				timeBetweenEvictionRunsMillis="30000" type="javax.sql.DataSource" validationQuery = "SELECT 1"
-				url="jdbc:jtds:sqlserver://MSSQL_ADDRS:MSSQL_PORT;databaseName=MSSQL_SEM_DB" username="MSSQL_USER" />
+			maximumPoolSize="50"
+			minimumIdle="20"
+			idleTimeout="60000"
+			maxLifetime="1800000"
+			connectionTimeout="10000"
+			initializationFailTimeout="5000"
 
-	  <Resource auth="Container" driverClassName="net.sourceforge.jtds.jdbc.Driver"
+			validationTimeout="5000"
+			connectionTestQuery="SELECT 1"
+			
+			removeAbandoned="true"
+			removeAbandonedTimeout="60"
+			logAbandoned="true"
+
+			timeBetweenEvictionRunsMillis="30000"
+
+			jdbcInterceptors="ConnectionState;StatementFinalizer;SlowQueryReportJmx(threshold=10000)"
+			jmxExport="true"
+		/>
+	  <Resource auth="Container" driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
 				initialSize="5" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(threshold=10000)"
 				dialect = "com.anamar.dialect.MSSQLDialect"
 				jmxEnabled="true" logAbandoned="true" maxActive="200" maxWait="30000"
@@ -34,17 +51,6 @@
 				testOnBorrow="true" testOnReturn="false" testWhileIdle="true"
 				timeBetweenEvictionRunsMillis="30000" type="javax.sql.DataSource" validationQuery = "SELECT 1"
 				url="jdbc:jtds:sqlserver://MSSQL_ADDRS:MSSQL_PORT;databaseName=MSSQL_GANTT_DB" username="MSSQL_USER" />
-
-	  <Resource auth="Container" driverClassName="net.sourceforge.jtds.jdbc.Driver"
-				initialSize="5" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(threshold=10000)"
-				dialect = "com.anamar.dialect.MSSQLDialect"
-				jmxEnabled="true" logAbandoned="true" maxActive="200" maxWait="30000"
-				minEvictableIdleTimeMillis="300000" minIdle="5" name="jdbc/GanttDb"
-				password="Sem2023*" removeAbandoned="true" removeAbandonedTimeout="60"
-				testOnBorrow="true" testOnReturn="false" testWhileIdle="true"
-				timeBetweenEvictionRunsMillis="30000" type="javax.sql.DataSource" validationQuery = "SELECT 1"
-				url="jdbc:jtds:sqlserver://mssql.semerp.svc.cluster.local:1433;databaseName=sem_gantt" username="sa" />
-
   </GlobalNamingResources>
 
   <Service name="Catalina">
