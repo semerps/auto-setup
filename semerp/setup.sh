@@ -80,6 +80,9 @@ create_database() {
 
   local sql="CREATE DATABASE [${database}] COLLATE ${collation};"
   sql_exec "${sql}"
+    # Enable READ_COMMITTED_SNAPSHOT
+    local snapshot_sql="ALTER DATABASE [${database}] SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;"
+    sql_exec "${snapshot_sql}"
 }
 
 # Veritabanı geri yükleme işlemini gerçekleştiren fonksiyon
