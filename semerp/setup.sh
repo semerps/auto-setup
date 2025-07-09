@@ -310,6 +310,17 @@ sed -i "s|MSSQL_USER|$mssql_user|g" files/conf/server.xml
 sed -i "s|MSSQL_PASS|$mssql_pass|g" files/conf/server.xml
 sed -i "s|MSSQL_SEM_DB|$mssql_sem_db|g" files/conf/server.xml
 sed -i "s|MSSQL_GANTT_DB|$mssql_gantt_db|g" files/conf/server.xml
+
+
+read -p "Lütfen Firma Tag (uzmar, uzmarTech vb. [camelCase - No Turkish Characters]) :" company_tag
+# Replace Turkish characters with Latin equivalents
+company_tag=$(echo "$company_tag" | tr 'ÇçĞğİıÖöŞşÜü' 'CcGgIiOoSsUu')
+
+sed -i "s|COMPANY_TAG|$company_tag|g" files/semerp/deployment.yaml
+sed -i "s|COMPANY_TAG|$company_tag|g" files/semerp/service.yaml
+sed -i "s|COMPANY_TAG|$company_tag|g" files/semerp/volume.yaml
+
+
 microk8s.kubectl apply -f files/semerp/ -n $namespace
 wait_for_pod $namespace semerp-latest
 upsert_config BryntumServiceUri "http://$ip_address:30080/gantt-service"

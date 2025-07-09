@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: semerp-latest
-  name: semerp-latest
+    run: semerp-COMPANY_TAG
+  name: semerp-COMPANY_TAG
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: semerp-latest
+      run: semerp-COMPANY_TAG
   template:
     metadata:
       labels:
-        run: semerp-latest  
+        run: semerp-COMPANY_TAG
     spec:
       dnsPolicy: ClusterFirst
       volumes:
@@ -32,50 +32,50 @@ spec:
           persistentVolumeClaim:
             claimName: sem-logsdir-pvc
       containers:
-      - image: semerp/sem-erp:latest
-        name: semerp
-        imagePullPolicy: Always
-#        resources: 
-#          limits:
-#            memory: "20Gi"
-#            cpu: "6000m"
-        ports:
-        - containerPort: 8090
-          name: http
-        - containerPort: 443
-          name: https
-        - containerPort: 8009
-          name: ajp 
-        - containerPort: 5000
-          name: jmx  
-        volumeMounts:
-        - name: shareddir
-          mountPath: "/var/opt/semerp"
-        - name: confdir
-          mountPath: "/usr/local/tomcat/conf"
-        - name: logsdir
-          mountPath: "/usr/local/tomcat/logs"
-        - name: jvmsecurity
-          mountPath: "/usr/local/openjdk-8/jre/lib/security"
-        - name: fonts
-          mountPath: "/usr/local/openjdk-8/jre/lib/fonts"
-        env:
-        - name: JAVA_OPTS
-          value: "-Duser.timezone=Europe/Istanbul -Dsem.basepath=http://127.0.0.1:8090/sem -Dsem.username=Administrator -Dsem.password=pass -Dbryntum.db=jdbc/GanttDb"
-        - name: CATALINA_OPTS
-          value: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.rmi.port=5000 -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote.ssl=false
-        startupProbe:
-          httpGet:
-            path: /sem
-            port: 8090
-          failureThreshold: 30
-          periodSeconds: 20
-        readinessProbe:
-          httpGet:
-            path: /sem
-            port: 8090
-          initialDelaySeconds: 200
-          periodSeconds: 10
-          failureThreshold: 30    
+        - image: semerp/sem-erp:COMPANY_TAG
+          name: semerp
+          imagePullPolicy: Always
+          #        resources:
+          #          limits:
+          #            memory: "20Gi"
+          #            cpu: "6000m"
+          ports:
+            - containerPort: 8090
+              name: http
+            - containerPort: 443
+              name: https
+            - containerPort: 8009
+              name: ajp
+            - containerPort: 5000
+              name: jmx
+          volumeMounts:
+            - name: shareddir
+              mountPath: "/var/opt/semerp"
+            - name: confdir
+              mountPath: "/usr/local/tomcat/conf"
+            - name: logsdir
+              mountPath: "/usr/local/tomcat/logs"
+            - name: jvmsecurity
+              mountPath: "/usr/local/openjdk-8/jre/lib/security"
+            - name: fonts
+              mountPath: "/usr/local/openjdk-8/jre/lib/fonts"
+          env:
+            - name: JAVA_OPTS
+              value: "-Duser.timezone=Europe/Istanbul -Dsem.basepath=http://127.0.0.1:8090/sem -Dsem.username=Administrator -Dsem.password=pass -Dbryntum.db=jdbc/GanttDb"
+            - name: CATALINA_OPTS
+              value: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.rmi.port=5000 -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote.ssl=false
+          startupProbe:
+            httpGet:
+              path: /sem
+              port: 8090
+            failureThreshold: 30
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /sem
+              port: 8090
+            initialDelaySeconds: 200
+            periodSeconds: 10
+            failureThreshold: 30
       imagePullSecrets:
-      - name: regcred            
+        - name: regcred

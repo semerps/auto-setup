@@ -4,7 +4,7 @@ metadata:
   name: sem-share-pv
 spec:
   capacity:
-    storage: 50Gi
+    storage: 150Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
@@ -17,7 +17,7 @@ metadata:
   name: sem-tomcat-pv
 spec:
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
