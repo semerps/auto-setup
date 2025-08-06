@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: documents
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: documents
+  template:
+    metadata:
+      labels:
+        app: documents
+    spec:
+      containers:
+        - name: documents
+          image: semerp/documents:latest
+          ports:
+            - containerPort: 8080
+              name: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: documents
+spec:
+  type: NodePort
+  selector:
+    app: documents
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30880
+      name: http
