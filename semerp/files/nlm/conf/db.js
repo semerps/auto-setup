@@ -1,8 +1,8 @@
 module.exports = {
   name: "NLM SERVER",
-  version: "1.5",
+  version: "1.9",
   env: process.env.NODE_ENV || "production",
-  port: process.env.PORT || "5040",
+  port: process.env.PORT || "30040",
   base_url: process.env.BASE_URL || "http://serverIP",
   db: {
     uri:
@@ -11,14 +11,8 @@ module.exports = {
     authDb: process.env.authDB || "admin",
   },
   ssl: false,
-  /*
-  ssl: {
-    key: "analytics_uzmar.key",
-    certificate: "analytics.uzmar.com.crt",
-    passphrase: "ksdfj8732as!."
-  } */
   sem: {
-    server: "http://semerp-latest.namespace.svc.cluster.local:8090/sem",
+    server: "http://semerp-COMPANY_TAG.namespace.svc.cluster.local:8090/sem",
     username: "Administrator",
     password: "pass",
   },
@@ -26,12 +20,9 @@ module.exports = {
     uri: "amqp://uzmartech:Sem123654@@rabbitmq.semerp.svc.cluster.local:5672/semerp",
   },
   elasticSearch: {
-    node: "https://elasticsearch.namespace.svc.cluster.local:9200",
-    auth: {
-      apiKey: "elk_api_key",
-    },
+    node: "http://elasticsearch.namespace.svc.cluster.local:9200",
+    // auth: { apiKey: "your-api-key" }, // If needed
   },
-
   autoTopicLogger: [
     {
       queueName: "nlm-sem-request-log",

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-data-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: ELASTIC_SEARCH_PATH/data
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-backup-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: ELASTIC_SEARCH_PATH/backup
