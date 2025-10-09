@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sem-b2b
+  namespace: semerp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sem-b2b
+  template:
+    metadata:
+      labels:
+        app: sem-b2b
+    spec:
+      containers:
+        - name: sem-b2b
+          image: semerp/sem-b2b:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATASOURCE_URL
+              value: "jdbc:sqlserver://sqlsrv\\sqlexpress;databaseName=b2bdb"
+            - name: DATASOURCE_USERNAME
+              value: "db_username"
+            - name: DATASOURCE_PASSWORD
+              value: "db_password"
+            - name: REST_USERNAME
+              value: "rest_username"
+            - name: REST_PASSWORD
+              value: "rest_password"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sem-b2b
+  namespace: semerp
+spec:
+  type: NodePort
+  selector:
+    app: sem-b2b
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30055
+      protocol: TCP
