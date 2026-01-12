@@ -35,10 +35,13 @@ spec:
         - image: semerp/sem-erp:COMPANY_TAG
           name: semerp
           imagePullPolicy: Always
-          #        resources:
-          #          limits:
-          #            memory: "20Gi"
-          #            cpu: "6000m"
+          resources:
+            requests:
+              memory: "12Gi"      # Başlangıç için 8GB garanti
+              cpu: "4000m"       # 4 CPU core garanti
+            limits:
+              memory: "24Gi"     # Maksimum 24GB kullanabilir
+              cpu: "8000m"       # Maksimum 8 CPU core kullanabilir
           ports:
             - containerPort: 8090
               name: http
@@ -65,17 +68,19 @@ spec:
             - name: CATALINA_OPTS
               value: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.rmi.port=5000 -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote.ssl=false
           startupProbe:
-            httpGet:
-              path: /sem
+            tcpSocket:
               port: 8090
-            failureThreshold: 30
-            periodSeconds: 20
+            initialDelaySeconds: 120  
+            failureThreshold: 16      
+            periodSeconds: 30         
+            timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /sem
               port: 8090
-            initialDelaySeconds: 200
-            periodSeconds: 10
-            failureThreshold: 30
+            initialDelaySeconds: 60    
+            periodSeconds: 15         
+            timeoutSeconds: 30         
+            failureThreshold: 3   
       imagePullSecrets:
         - name: regcred
