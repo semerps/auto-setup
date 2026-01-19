@@ -23,24 +23,17 @@
 			username="MSSQL_USER"
 			password="MSSQL_PASS"
 
-			maximumPoolSize="50"
-			minimumIdle="20"
-			idleTimeout="60000"
-			maxLifetime="1800000"
-			connectionTimeout="10000"
-			initializationFailTimeout="5000"
+            maximumPoolSize="25"
+            minimumIdle="3"
 
-			validationTimeout="5000"
-			connectionTestQuery="SELECT 1"
+            connectionTimeout="10000"
+            validationTimeout="5000"
+            idleTimeout="300000"
+            maxLifetime="1740000"
+            keepaliveTime="120000"
 
-			removeAbandoned="true"
-			removeAbandonedTimeout="60"
-			logAbandoned="true"
-
-			timeBetweenEvictionRunsMillis="30000"
-
-			jdbcInterceptors="ConnectionState;StatementFinalizer;SlowQueryReportJmx(threshold=10000)"
-			jmxExport="true"
+            leakDetectionThreshold="60000"
+            initializationFailTimeout="1"
 		/>
 		<Resource
 			name="jdbc/GanttDb"
